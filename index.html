@@ -409,7 +409,7 @@
       .table-wrap{box-shadow:none;border:none}thead th{position:static}
     }
   </style>
-<!-- floating-header-clone-version: 2026-06-04 -->
+<!-- floating-header-clone-version: 2026-06-04; export-fix-final: 2026-06-04 -->
 </head>
 <body>
 <div class="wrap" id="top">
@@ -626,6 +626,31 @@
               <label class="chk-item"><input id="caseSensitive" type="checkbox"> Case sensitive</label>
               <label class="chk-item"><input id="exactNepali" type="checkbox"> Exact Nepali</label>
               <label class="chk-item"><input id="customTextToggle" type="checkbox"> Custom text add</label>
+            </div>
+
+            <div class="mgrid g4" style="margin-bottom:8px">
+              <div class="field"><label>Copy filtered data as</label>
+                <select id="copyFormat">
+                  <option value="json">Copy as JSON</option>
+                  <option value="csv">Copy as CSV</option>
+                  <option value="tsv" selected>Copy as TSV</option>
+                  <option value="psv">Copy as PSV</option>
+                  <option value="mysql">Copy as MySQL</option>
+                  <option value="custom">Custom separator</option>
+                </select>
+              </div>
+              <div class="field"><label>Custom separator</label><input id="copyCustomSeparator" type="text" value="|" placeholder="e.g. | ; , / →"></div>
+              <div class="field"><label>Copy</label><button id="copyFilteredData" class="tbtn teal" data-tip="Copy filtered data" style="width:100%"><i class="ph ph-clipboard-text"></i></button></div>
+              <div class="field"><label>Download filtered data as</label>
+                <select id="downloadFormat">
+                  <option value="xls">Download as .xls</option>
+                  <option value="pdf">Download as PDF</option>
+                  <option value="docx">Download as .docx</option>
+                  <option value="txt">Download as .txt</option>
+                </select>
+              </div>
+              <div class="field"><label>Download</label><button id="downloadFilteredData" class="tbtn primary" data-tip="Download filtered data" style="width:100%"><i class="ph ph-download-simple"></i></button></div>
+              <div class="field" style="grid-column:span 3"><label>Scope</label><div class="freeze-note" style="margin-top:7px">Copies/downloads filtered rows using visible columns and current column order.</div></div>
             </div>
 
             <div class="mgrid g4" style="margin-bottom:8px">
@@ -936,7 +961,7 @@ function buildFloatingHeader(){
   const sourceRow=$('theadRow');
   if(!sourceRow||!sourceRow.children.length){fh.innerHTML='';return;}
   const cloneTable=document.createElement('table');
-  cloneTable.innerHTML='<thead><tr>'+sourceRow.innerHTML+'</tr></thead>';
+  cloneTable.innerHTML='<thead><tr>'+sourceRow.innerHTML+'<\/tr><\/thead>';
   fh.innerHTML='';
   fh.appendChild(cloneTable);
   syncFloatingHeaderGeometry();
@@ -1139,7 +1164,7 @@ function normalizedHighlightHtml(text,q){
   }
   if(!ranges.length)return escHtml(original);
   let out='',last=0;
-  for(const[a,b]of ranges){out+=escHtml(original.slice(last,a))+`<mark>${escHtml(original.slice(a,b))}</mark>`;last=b;}
+  for(const[a,b]of ranges){out+=escHtml(original.slice(last,a))+`<mark>${escHtml(original.slice(a,b))}<\/mark>`;last=b;}
   return out+escHtml(original.slice(last));
 }
 function cellHtml(text){
@@ -1154,29 +1179,29 @@ function cellHtml(text){
     return normalizedHighlightHtml(text,q);
   }
   const rx=getRegex();if(!rx)return safe;
-  return safe.replace(rx,m=>`<mark>${m}</mark>`);
+  return safe.replace(rx,m=>`<mark>${m}<\/mark>`);
 }
 
 /* ── RENDERING ── */
 function columnClass(k){return state.visibleCols.has(k)?'':' hidden-col';}
 function renderHeader(){
   const headers=getOrderedHeaders();
-  $('theadRow').innerHTML=headers.map(([k,label],idx)=>`<th data-col-key="${escHtml(k)}" data-col-idx="${idx}" class="${k==='__sn'?'col-sn':''}${columnClass(k)}"><div class="th-flex"><span>${escHtml(label)}</span><button class="head-copy-btn" data-col-key="${escHtml(k)}" title="copy whole column">${COPY_ICON}</button></div></th>`).join('');
+  $('theadRow').innerHTML=headers.map(([k,label],idx)=>`<th data-col-key="${escHtml(k)}" data-col-idx="${idx}" class="${k==='__sn'?'col-sn':''}${columnClass(k)}"><div class="th-flex"><span>${escHtml(label)}<\/span><button class="head-copy-btn" data-col-key="${escHtml(k)}" title="copy whole column">${COPY_ICON}<\/button><\/div><\/th>`).join('');
 }
-const COPY_ICON=`<i class="ph ph-copy" style="font-size:11px"></i>`;
-const CHECK_ICON=`<i class="ph ph-check" style="font-size:11px"></i>`;
+const COPY_ICON=`<i class="ph ph-copy" style="font-size:11px"><\/i>`;
+const CHECK_ICON=`<i class="ph ph-check" style="font-size:11px"><\/i>`;
 function isNameLikeKey(k){return /नाम|name/i.test(k);}
 function isLongTextKey(k){return /विवरण|संक्षिप्त|description|detail|summary|फैसलाको/i.test(k);}
 function rowCell(k,r,i,start){
   const colIdx=getOrderedHeaders().findIndex(([hk])=>hk===k);
-  if(k==='__sn')return`<td data-col-key="${escHtml(k)}" data-col-idx="${colIdx}" class="col-sn${columnClass(k)}"><div class="sn-cell-flex"><span>${start+i+1}</span><button class="row-copy-btn" data-row-pos="${i}" title="copy whole row">${COPY_ICON}</button></div></td>`;
+  if(k==='__sn')return`<td data-col-key="${escHtml(k)}" data-col-idx="${colIdx}" class="col-sn${columnClass(k)}"><div class="sn-cell-flex"><span>${start+i+1}<\/span><button class="row-copy-btn" data-row-pos="${i}" title="copy whole row">${COPY_ICON}<\/button><\/div><\/td>`;
   const val=displayValue(r,k);
   const cls=`${columnClass(k)}${isLongTextKey(k)?' long-cell':''}`;
   const contentClass=isNameLikeKey(k)?'cell-content name-text':'cell-content';
   const inner=k===state.filter1Key||k===state.filter2Key
-    ? `<span class="sex-badge">${cellHtml(val)}</span>`
-    : `<span class="${contentClass}">${cellHtml(val)}</span>`;
-  return`<td data-col-key="${escHtml(k)}" data-col-idx="${colIdx}" class="${cls}"><div class="cell-flex">${inner}<button class="cell-copy-btn" data-copy="${escHtml(val)}" title="copy cell">${COPY_ICON}</button></div></td>`;
+    ? `<span class="sex-badge">${cellHtml(val)}<\/span>`
+    : `<span class="${contentClass}">${cellHtml(val)}<\/span>`;
+  return`<td data-col-key="${escHtml(k)}" data-col-idx="${colIdx}" class="${cls}"><div class="cell-flex">${inner}<button class="cell-copy-btn" data-copy="${escHtml(val)}" title="copy cell">${COPY_ICON}<\/button><\/div><\/td>`;
 }
 function render(){
   if($('transposeToggle')?.checked){
@@ -1186,7 +1211,7 @@ function render(){
   renderHeader();
   const{rows,pages,start}=visibleSlice();
   const headers=getOrderedHeaders();
-  $('tbody').innerHTML=rows.length?rows.map((r,i)=>`<tr>${headers.map(([k])=>rowCell(k,r,i,start)).join('')}</tr>`).join(''):'';
+  $('tbody').innerHTML=rows.length?rows.map((r,i)=>`<tr>${headers.map(([k])=>rowCell(k,r,i,start)).join('')}<\/tr>`).join(''):'';
   $('empty').hidden=rows.length!==0;
   const shown=state.filtered.length.toLocaleString(),total=DATA.length.toLocaleString();
   $('shownCount').textContent=shown;$('totalCount').textContent=total;
@@ -1203,21 +1228,21 @@ function render(){
   applyFreeze();
 }
 function transposedCellHtml(value){
-  return `<div class="cell-flex"><span class="cell-content">${cellHtml(value)}</span><button class="cell-copy-btn" data-copy="${escHtml(value)}" title="copy cell">${COPY_ICON}</button></div>`;
+  return `<div class="cell-flex"><span class="cell-content">${cellHtml(value)}<\/span><button class="cell-copy-btn" data-copy="${escHtml(value)}" title="copy cell">${COPY_ICON}<\/button><\/div>`;
 }
 function renderTransposed(){
   const{rows,pages,start}=visibleSlice();
   const fields=getOrderedHeaders().filter(([k])=>k!=='__sn'&&state.visibleCols.has(k));
-  const headCells=[`<th data-trans-head="field"><div class="th-flex"><span>Field</span><button class="head-copy-btn" data-trans-col="field" title="copy field names">${COPY_ICON}</button></div></th>`];
+  const headCells=[`<th data-trans-head="field"><div class="th-flex"><span>Field<\/span><button class="head-copy-btn" data-trans-col="field" title="copy field names">${COPY_ICON}<\/button><\/div><\/th>`];
   rows.forEach((r,i)=>{
     const label=`Record ${start+i+1}`;
-    headCells.push(`<th data-trans-col="${i}"><div class="th-flex"><span>${escHtml(label)}</span><button class="head-copy-btn" data-trans-col="${i}" title="copy record column">${COPY_ICON}</button></div></th>`);
+    headCells.push(`<th data-trans-col="${i}"><div class="th-flex"><span>${escHtml(label)}<\/span><button class="head-copy-btn" data-trans-col="${i}" title="copy record column">${COPY_ICON}<\/button><\/div><\/th>`);
   });
   $('theadRow').innerHTML=headCells.join('');
   $('tbody').innerHTML=fields.length?fields.map(([k,label])=>{
-    const fieldCell=`<td class="trans-field-cell"><div class="sn-cell-flex"><span>${escHtml(label)}</span><button class="row-copy-btn" data-trans-row-key="${escHtml(k)}" title="copy field row">${COPY_ICON}</button></div></td>`;
-    const vals=rows.map((r,i)=>`<td data-trans-row-key="${escHtml(k)}" data-trans-col="${i}" class="${isLongTextKey(k)?' long-cell':''}">${transposedCellHtml(displayValue(r,k))}</td>`).join('');
-    return `<tr>${fieldCell}${vals}</tr>`;
+    const fieldCell=`<td class="trans-field-cell"><div class="sn-cell-flex"><span>${escHtml(label)}<\/span><button class="row-copy-btn" data-trans-row-key="${escHtml(k)}" title="copy field row">${COPY_ICON}<\/button><\/div><\/td>`;
+    const vals=rows.map((r,i)=>`<td data-trans-row-key="${escHtml(k)}" data-trans-col="${i}" class="${isLongTextKey(k)?' long-cell':''}">${transposedCellHtml(displayValue(r,k))}<\/td>`).join('');
+    return `<tr>${fieldCell}${vals}<\/tr>`;
   }).join(''):'';
   $('empty').hidden=rows.length!==0&&fields.length!==0;
   const shown=state.filtered.length.toLocaleString(),total=DATA.length.toLocaleString();
@@ -1255,9 +1280,9 @@ function pickKey(candidates){
 }
 function setFieldLabel(id,text){const field=$(id)?.closest('.field');const label=field?.querySelector('label');if(label)label.textContent=text;}
 function initDynamicControls(){
-  const colOptions='<option value="all">All columns</option>'+DATA_KEYS.map(k=>`<option value="${escHtml(k)}">${escHtml(k)}</option>`).join('');
+  const colOptions='<option value="all">All columns<\/option>'+DATA_KEYS.map(k=>`<option value="${escHtml(k)}">${escHtml(k)}<\/option>`).join('');
   $('column').innerHTML=colOptions;
-  $('sortColumn').innerHTML='<option value="">Default order</option>'+DATA_KEYS.map(k=>`<option value="${escHtml(k)}">${escHtml(k)}</option>`).join('');
+  $('sortColumn').innerHTML='<option value="">Default order<\/option>'+DATA_KEYS.map(k=>`<option value="${escHtml(k)}">${escHtml(k)}<\/option>`).join('');
 
   state.filter1Key=pickKey(['फैसला','decision','outcome','status','type']);
   state.filter2Key=pickKey(['मुद्दा','case','subject','विषय']);
@@ -1270,13 +1295,13 @@ function initDynamicControls(){
   $('licFrom').placeholder=state.rangeKey&&state.rangeKey.includes('मिति')?'e.g. 2072-01-01':'e.g. 1';
   $('licTo').placeholder=state.rangeKey&&state.rangeKey.includes('मिति')?'e.g. 2080-12-30':'e.g. 500';
 
-  $('sexFilter').innerHTML='<option value="">All</option>'+(state.filter1Key?uniqueValues(state.filter1Key).map(v=>`<option>${escHtml(v)}</option>`).join(''):'');
-  $('typeFilter').innerHTML='<option value="">All</option>'+(state.filter2Key?uniqueValues(state.filter2Key).map(v=>`<option>${escHtml(v)}</option>`).join(''):'');
+  $('sexFilter').innerHTML='<option value="">All<\/option>'+(state.filter1Key?uniqueValues(state.filter1Key).map(v=>`<option>${escHtml(v)}<\/option>`).join(''):'');
+  $('typeFilter').innerHTML='<option value="">All<\/option>'+(state.filter2Key?uniqueValues(state.filter2Key).map(v=>`<option>${escHtml(v)}<\/option>`).join(''):'');
   setDefaultColumnSequenceHint();
   refreshColumnOrder();
 }
 function initColumns(){
-  $('columnChecks').innerHTML=HEADERS.map(([k,label])=>`<label class="chk-item"><input type="checkbox" data-col="${escHtml(k)}" checked> ${escHtml(label)}</label>`).join('');
+  $('columnChecks').innerHTML=HEADERS.map(([k,label])=>`<label class="chk-item"><input type="checkbox" data-col="${escHtml(k)}" checked> ${escHtml(label)}<\/label>`).join('');
   $('columnChecks').addEventListener('change',e=>{
     if(!e.target.matches('input[data-col]'))return;
     const col=e.target.dataset.col;
@@ -1288,7 +1313,7 @@ function initColumns(){
 function clearAll(){
   $('q').value='';$('column').value='all';$('mode').value='contains';
   $('sexFilter').value='';$('typeFilter').value='';$('licFrom').value='';$('licTo').value='';
-  $('filterRows').checked=true;$('nepaliNorm').checked=true;$('customTextToggle').checked=false;$('customTextValue').value='';$('customTextPosition').value='prefix';$('customTextColumns').value='';$('freezeHeaderToggle').checked=true;$('freezeToggle').checked=false;$('freezeCols').value='0';$('columnSequence').value='';$('wrapTextToggle').checked=true;if($('transposeToggle'))$('transposeToggle').checked=false;if($('autoFitToggle'))$('autoFitToggle').checked=false;refreshColumnOrder();applyHeaderFreezeSetting();applyWrapTextSetting();applyAutoFitSetting();applyTransposeSetting();
+  $('filterRows').checked=true;$('nepaliNorm').checked=true;if($('copyFormat'))$('copyFormat').value='tsv';if($('downloadFormat'))$('downloadFormat').value='xls';if($('copyCustomSeparator'))$('copyCustomSeparator').value='|';updateCopySeparatorState();$('customTextToggle').checked=false;$('customTextValue').value='';$('customTextPosition').value='prefix';$('customTextColumns').value='';$('freezeHeaderToggle').checked=true;$('freezeToggle').checked=false;$('freezeCols').value='0';$('columnSequence').value='';$('wrapTextToggle').checked=true;if($('transposeToggle'))$('transposeToggle').checked=false;if($('autoFitToggle'))$('autoFitToggle').checked=false;refreshColumnOrder();applyHeaderFreezeSetting();applyWrapTextSetting();applyAutoFitSetting();applyTransposeSetting();
   $('sortColumn').value='';$('sortOrder').value='az';state.sortCol='';state.sortOrder='az';
   state.page=1;applySearch();
 }
@@ -1298,13 +1323,181 @@ async function copyText(text,msg){
 }
 function showToast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1500);}
 function getVisibleHeaders(){return getOrderedHeaders().filter(([k])=>state.visibleCols.has(k));}
-function copyTableToClipboard(){
-  const headers=getVisibleHeaders();
-  const lines=[headers.map(([,label])=>label).join('\t')];
-  state.filtered.forEach((r,idx)=>{
-    lines.push(headers.map(([k])=>k==='__sn'?String(idx+1):String(displayValue(r,k)).replace(/\s+/g,' ').trim()).join('\t'));
+function exportCellValue(row,key,idx){
+  return key==='__sn'?String(idx+1):String(displayValue(row,key)).replace(/\s+/g,' ').trim();
+}
+function uniqueExportLabels(headers){
+  const seen={};
+  return headers.map(([k,label])=>{
+    const base=String(label||k||'Column').trim()||'Column';
+    seen[base]=(seen[base]||0)+1;
+    return seen[base]===1?base:`${base}_${seen[base]}`;
   });
-  copyText(lines.join('\n'),`${state.filtered.length.toLocaleString()} rows copied`);
+}
+function escapeDelimited(value,sep){
+  const s=String(value??'');
+  const mustQuote=s.includes('"')||s.includes('\n')||s.includes('\r')||(sep&&s.includes(sep));
+  return mustQuote?'"'+s.replace(/"/g,'""')+'"':s;
+}
+function separatorForFormat(format){
+  if(format==='csv')return ',';
+  if(format==='tsv')return '\t';
+  if(format==='psv')return '|';
+  if(format==='custom'){
+    const custom=$('copyCustomSeparator')?.value??'';
+    return custom===''?'|':custom;
+  }
+  return '\t';
+}
+function mysqlIdent(name){return '`'+String(name||'column').replace(/`/g,'``')+'`';}
+function mysqlValue(value){
+  const s=String(value ?? '');
+  if(s === '') return 'NULL';
+  const escaped = s
+    .split('\\').join('\\\\')
+    .split("'").join("''")
+    .split('\r').join('\\r')
+    .split('\n').join('\\n');
+  return "'" + escaped + "'";
+}
+function exportFilteredData(format){
+  const headers=getVisibleHeaders();
+  const labels=uniqueExportLabels(headers);
+  if(format==='json'){
+    return JSON.stringify(state.filtered.map((row,idx)=>{
+      const obj={};
+      headers.forEach(([k],i)=>{obj[labels[i]]=exportCellValue(row,k,idx);});
+      return obj;
+    }),null,2);
+  }
+  if(format==='mysql'){
+    const table='constitutional_bench_data';
+    const cols=labels.map(mysqlIdent).join(', ');
+    const lines=[`-- ${state.filtered.length} filtered rows exported from Constitutional Bench Smart Search`,`CREATE TABLE IF NOT EXISTS ${mysqlIdent(table)} (${labels.map(l=>mysqlIdent(l)+' TEXT').join(', ')});`];
+    state.filtered.forEach((row,idx)=>{
+      const vals=headers.map(([k])=>mysqlValue(exportCellValue(row,k,idx))).join(', ');
+      lines.push(`INSERT INTO ${mysqlIdent(table)} (${cols}) VALUES (${vals});`);
+    });
+    return lines.join('\n');
+  }
+  const sep=separatorForFormat(format);
+  const lines=[labels.map(v=>escapeDelimited(v,sep)).join(sep)];
+  state.filtered.forEach((row,idx)=>{
+    lines.push(headers.map(([k])=>escapeDelimited(exportCellValue(row,k,idx),sep)).join(sep));
+  });
+  return lines.join('\n');
+}
+function copyFilteredDataAs(format){
+  format=format||$('copyFormat')?.value||'tsv';
+  const text=exportFilteredData(format);
+  const label=String(format).toUpperCase()==='CUSTOM'?'custom-separated':String(format).toUpperCase();
+  copyText(text,`${state.filtered.length.toLocaleString()} rows copied as ${label}`);
+}
+function copyTableToClipboard(){
+  copyFilteredDataAs($('copyFormat')?.value||'tsv');
+}
+function updateCopySeparatorState(){
+  const isCustom=$('copyFormat')?.value==='custom';
+  const el=$('copyCustomSeparator');
+  if(el){el.disabled=!isCustom;el.style.opacity=isCustom?'1':'.55';}
+}
+function safeFileStamp(){
+  const d=new Date();
+  const pad=n=>String(n).padStart(2,'0');
+  return `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}_${pad(d.getHours())}${pad(d.getMinutes())}`;
+}
+function downloadBlob(blob,filename){
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();
+  setTimeout(()=>{URL.revokeObjectURL(url);a.remove();},500);
+}
+function exportRowsMatrix(){
+  const headers=getVisibleHeaders();
+  const labels=uniqueExportLabels(headers);
+  const rows=state.filtered.map((row,idx)=>headers.map(([k])=>exportCellValue(row,k,idx)));
+  return {headers,labels,rows};
+}
+function exportTableHtml(title='Constitutional Bench filtered data'){
+  const {labels,rows}=exportRowsMatrix();
+  const th=labels.map(h=>`<th>${escHtml(h)}<\/th>`).join('');
+  const trs=rows.map(r=>'<tr>'+r.map(c=>`<td>${escHtml(c)}<\/td>`).join('')+'<\/tr>').join('');
+  return `<!doctype html><html><head><meta charset="utf-8"><title>${escHtml(title)}<\/title><style>body{font-family:Noto Sans Devanagari,Arial,sans-serif;font-size:12px}table{border-collapse:collapse;width:100%}th,td{border:1px solid #999;padding:5px;vertical-align:top}th{background:#eee;font-weight:700}h2{font-size:16px}<\/style><\/head><body><h2>${escHtml(title)}<\/h2><table><thead><tr>${th}<\/tr><\/thead><tbody>${trs}<\/tbody><\/table><\/body><\/html>`;
+}
+function downloadXls(){
+  const html='\ufeff'+exportTableHtml('Constitutional Bench filtered data');
+  downloadBlob(new Blob([html],{type:'application/vnd.ms-excel;charset=utf-8'}),`constitutional_bench_filtered_${safeFileStamp()}.xls`);
+  showToast(`${state.filtered.length.toLocaleString()} rows downloaded as XLS`);
+}
+function downloadTxt(){
+  const text=exportFilteredData('tsv');
+  downloadBlob(new Blob(['\ufeff'+text],{type:'text/plain;charset=utf-8'}),`constitutional_bench_filtered_${safeFileStamp()}.txt`);
+  showToast(`${state.filtered.length.toLocaleString()} rows downloaded as TXT`);
+}
+function printPdf(){
+  const html=exportTableHtml('Constitutional Bench filtered data');
+  const w=window.open('','_blank');
+  if(!w){showToast('Popup blocked. Please allow popups for PDF.');return;}
+  w.document.open();
+  w.document.write(html.replace('<\/head>','<style>@media print{@page{size:A4 landscape;margin:10mm}}<\/style><\/head>'));
+  w.document.close();
+  w.focus();
+  setTimeout(()=>{w.print();},350);
+  showToast('PDF print window opened');
+}
+function xmlEsc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&apos;'}[m]));}
+function wordCell(text){return `<w:tc><w:tcPr><w:tcW w:w="2400" w:type="dxa"/><\/w:tcPr><w:p><w:r><w:t xml:space="preserve">${xmlEsc(text)}<\/w:t><\/w:r><\/w:p><\/w:tc>`;}
+function buildDocxDocumentXml(){
+  const {labels,rows}=exportRowsMatrix();
+  const headerRow='<w:tr>'+labels.map(wordCell).join('')+'<\/w:tr>';
+  const bodyRows=rows.map(r=>'<w:tr>'+r.map(wordCell).join('')+'<\/w:tr>').join('');
+  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body><w:p><w:r><w:t>Constitutional Bench filtered data<\/w:t><\/w:r><\/w:p><w:tbl><w:tblPr><w:tblW w:w="0" w:type="auto"/><w:tblBorders><w:top w:val="single" w:sz="4"/><w:left w:val="single" w:sz="4"/><w:bottom w:val="single" w:sz="4"/><w:right w:val="single" w:sz="4"/><w:insideH w:val="single" w:sz="4"/><w:insideV w:val="single" w:sz="4"/><\/w:tblBorders><\/w:tblPr>${headerRow}${bodyRows}<\/w:tbl><w:sectPr><w:pgSz w:w="16838" w:h="11906" w:orient="landscape"/><w:pgMar w:top="720" w:right="720" w:bottom="720" w:left="720"/><\/w:sectPr><\/w:body><\/w:document>`;
+}
+function crc32(str){
+  const bytes=new TextEncoder().encode(str);let c=~0;
+  for(const b of bytes){c^=b;for(let k=0;k<8;k++)c=(c>>>1)^(0xEDB88320&-(c&1));}
+  return (~c)>>>0;
+}
+function u16(n){return [n&255,(n>>>8)&255];}
+function u32(n){return [n&255,(n>>>8)&255,(n>>>16)&255,(n>>>24)&255];}
+function dosTimeDate(){
+  const d=new Date();
+  const time=(d.getHours()<<11)|(d.getMinutes()<<5)|(Math.floor(d.getSeconds()/2));
+  const date=((d.getFullYear()-1980)<<9)|((d.getMonth()+1)<<5)|d.getDate();
+  return {time,date};
+}
+function makeZip(files){
+  const enc=new TextEncoder();const chunks=[];const central=[];let offset=0;const dt=dosTimeDate();
+  for(const f of files){
+    const name=enc.encode(f.name),data=enc.encode(f.content),crc=crc32(f.content);
+    const local=new Uint8Array([...u32(0x04034b50),...u16(20),...u16(0),...u16(0),...u16(dt.time),...u16(dt.date),...u32(crc),...u32(data.length),...u32(data.length),...u16(name.length),...u16(0)]);
+    chunks.push(local,name,data);
+    central.push({name,data,crc,offset});
+    offset+=local.length+name.length+data.length;
+  }
+  const centralStart=offset;
+  for(const f of central){
+    const cen=new Uint8Array([...u32(0x02014b50),...u16(20),...u16(20),...u16(0),...u16(0),...u16(dt.time),...u16(dt.date),...u32(f.crc),...u32(f.data.length),...u32(f.data.length),...u16(f.name.length),...u16(0),...u16(0),...u16(0),...u16(0),...u32(0),...u32(f.offset)]);
+    chunks.push(cen,f.name);offset+=cen.length+f.name.length;
+  }
+  const centralSize=offset-centralStart;
+  chunks.push(new Uint8Array([...u32(0x06054b50),...u16(0),...u16(0),...u16(central.length),...u16(central.length),...u32(centralSize),...u32(centralStart),...u16(0)]));
+  return new Blob(chunks,{type:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'});
+}
+function downloadDocx(){
+  const files=[
+    {name:'[Content_Types].xml',content:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><\/Types>'},
+    {name:'_rels/.rels',content:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/><\/Relationships>'},
+    {name:'word/document.xml',content:buildDocxDocumentXml()}
+  ];
+  downloadBlob(makeZip(files),`constitutional_bench_filtered_${safeFileStamp()}.docx`);
+  showToast(`${state.filtered.length.toLocaleString()} rows downloaded as DOCX`);
+}
+function downloadFilteredDataAs(format){
+  format=format||$('downloadFormat')?.value||'xls';
+  if(format==='xls')return downloadXls();
+  if(format==='pdf')return printPdf();
+  if(format==='docx')return downloadDocx();
+  if(format==='txt')return downloadTxt();
 }
 
 function rowToClipboardLine(row,globalIndex){
@@ -1385,8 +1578,8 @@ function shAdd(q){if(!q)return;let h=shLoad().filter(x=>x!==q);h.unshift(q);if(h
 function shRemove(q){shSave(shLoad().filter(x=>x!==q));}
 function shRender(){
   const h=shLoad();const container=$('shItems');
-  if(!h.length){container.innerHTML=`<div class="sh-empty">No recent searches</div>`;return;}
-  container.innerHTML=h.map(q=>`<div class="sh-item" data-q="${escHtml(q)}"><i class="ph ph-clock-counter-clockwise"></i><span class="sh-item-text">${escHtml(q)}</span><button class="sh-del" data-del="${escHtml(q)}" title="Remove"><i class="ph ph-x"></i></button></div>`).join('');
+  if(!h.length){container.innerHTML=`<div class="sh-empty">No recent searches<\/div>`;return;}
+  container.innerHTML=h.map(q=>`<div class="sh-item" data-q="${escHtml(q)}"><i class="ph ph-clock-counter-clockwise"><\/i><span class="sh-item-text">${escHtml(q)}<\/span><button class="sh-del" data-del="${escHtml(q)}" title="Remove"><i class="ph ph-x"><\/i><\/button><\/div>`).join('');
 }
 function shOpen(){shRender();$('searchHistory').classList.add('open');}
 function shClose(){$('searchHistory').classList.remove('open');}
@@ -1461,7 +1654,7 @@ function bindEvents(){
   $('sortApply').addEventListener('click',()=>{state.sortCol=$('sortColumn').value;state.sortOrder=$('sortOrder').value;applySearch();});
   $('sortClear').addEventListener('click',()=>{$('sortColumn').value='';$('sortOrder').value='az';state.sortCol='';state.sortOrder='az';applySearch();});
   ['licFrom','licTo'].forEach(id=>$(id).addEventListener('input',()=>{if($('realtime').checked)applySearch();}));
-  $('nextHit').addEventListener('click',()=>nextHit(1));$('prevHit').addEventListener('click',()=>nextHit(-1));$('copyTable').addEventListener('click',copyTableToClipboard);
+  $('nextHit').addEventListener('click',()=>nextHit(1));$('prevHit').addEventListener('click',()=>nextHit(-1));$('copyTable').addEventListener('click',copyTableToClipboard);$('copyFilteredData')?.addEventListener('click',()=>copyFilteredDataAs($('copyFormat')?.value||'tsv'));$('downloadFilteredData')?.addEventListener('click',()=>downloadFilteredDataAs($('downloadFormat')?.value||'xls'));$('copyFormat')?.addEventListener('change',updateCopySeparatorState);
   $('themeBtn').addEventListener('click',()=>setTheme(document.documentElement.dataset.theme==='dark'?'light':'dark'));
   $('tbody').addEventListener('click',e=>{const btn=e.target.closest('.copy-btn,.cell-copy-btn,.row-copy-btn');if(!btn)return;if(btn.classList.contains('row-copy-btn')){if(btn.dataset.transRowKey)copyTransposedRow(btn.dataset.transRowKey);else copyVisibleRowByPagePos(parseInt(btn.dataset.rowPos||'0',10));}else{copyText(btn.dataset.copy??btn.dataset.name??'','Cell copied');}btn.innerHTML=CHECK_ICON;btn.classList.add('copied');setTimeout(()=>{btn.innerHTML=COPY_ICON;btn.classList.remove('copied');},900);});
   $('theadRow').addEventListener('click',e=>{const btn=e.target.closest('.head-copy-btn');if(!btn)return;e.stopPropagation();if(btn.dataset.transCol!==undefined)copyTransposedColumn(btn.dataset.transCol);else copyColumnByKey(btn.dataset.colKey);btn.innerHTML=CHECK_ICON;btn.classList.add('copied');setTimeout(()=>{btn.innerHTML=COPY_ICON;btn.classList.remove('copied');},900);});
@@ -1491,12 +1684,12 @@ async function bootTable(){
   try{setTheme(localStorage.getItem('cbTheme')||'light');}catch(e){setTheme('light');}
   const empty=$('empty');
   const startTime=performance.now();let timerId=null;
-  if(empty){empty.hidden=false;empty.innerHTML='<div class="empty-state">Loading cbdata.js… <span id="loadingTimer">0.0s</span></div>';timerId=setInterval(()=>{const timerEl=$('loadingTimer');if(timerEl)timerEl.textContent=`${((performance.now()-startTime)/1000).toFixed(1)}s`;},100);}
+  if(empty){empty.hidden=false;empty.innerHTML='<div class="empty-state">Loading cbdata.js… <span id="loadingTimer">0.0s<\/span><\/div>';timerId=setInterval(()=>{const timerEl=$('loadingTimer');if(timerEl)timerEl.textContent=`${((performance.now()-startTime)/1000).toFixed(1)}s`;},100);}
   try{
     const result=await loadCBData();clearInterval(timerId);
     RAW_DATA=result.rows;DATA=prepareRows(RAW_DATA);
     if(!DATA.length){
-      if(empty){empty.hidden=false;empty.innerHTML='<div class="empty-state">Data file भेटिएन वा पढ्न सकिएन।<br><small style="color:var(--text3)">कृपया <b>cbdata.js</b> यही folder मा राख्नुहोस्। Raw JSON array वा <b>window.CB_DATA = [...]</b> दुवै support हुन्छ।</small></div>';}
+      if(empty){empty.hidden=false;empty.innerHTML='<div class="empty-state">Data file भेटिएन वा पढ्न सकिएन।<br><small style="color:var(--text3)">कृपया <b>cbdata.js<\/b> यही folder मा राख्नुहोस्। Raw JSON array वा <b>window.CB_DATA = [...]<\/b> दुवै support हुन्छ।<\/small><\/div>';}
       return;
     }
     initDynamicControls();initColumns();state.filtered=DATA.slice();applySearch();
