@@ -218,6 +218,31 @@
     .go-row{display:grid;grid-template-columns:1fr auto;gap:6px;align-items:end;margin-top:8px}
     .go-row input{height:32px}
     .go-row .tbtn{width:32px;height:32px}
+
+    .data-file-panel{display:flex;flex-direction:column;gap:7px;max-height:220px;overflow:auto;padding:4px 2px}
+    .data-file-panel::-webkit-scrollbar{width:4px}
+    .data-file-panel::-webkit-scrollbar-thumb{background:var(--line2);border-radius:99px}
+    .data-file-item{display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--surface2);border:1px solid var(--line);border-radius:var(--r);padding:6px 8px;font-size:12px;color:var(--text2);cursor:pointer;user-select:none}
+    .data-file-item input{width:13px;height:13px;accent-color:var(--brand);cursor:pointer;flex-shrink:0}
+    .data-file-name{display:inline-flex;align-items:center;gap:6px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .data-file-count{font-size:10.5px;color:var(--text3);font-weight:700;flex-shrink:0}
+    .source-separator td{background:var(--brand-soft)!important;color:var(--brand)!important;font-weight:800;font-size:12px;border-top:1px solid rgba(184,58,11,.2);border-bottom:1px solid rgba(184,58,11,.2)}
+    .source-separator td .source-title{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+    .source-separator td .source-title small{font-size:10.5px;color:var(--text3);font-weight:700}
+    .source-table-head td{padding:0!important;background:var(--thead)!important;border-bottom:1px solid var(--line)!important}
+    .source-table-head-row{display:grid;align-items:stretch;width:100%;overflow:hidden}
+    .source-table-head-cell{display:flex;align-items:center;gap:6px;padding:8px 13px;border-right:1px solid var(--line);font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--text2);white-space:nowrap;min-width:0;overflow:hidden;text-overflow:ellipsis}
+    .source-table-head-cell:first-child{padding-left:16px;justify-content:flex-end}
+    .source-table-head-cell:last-child{border-right:0}
+    .source-break td{height:18px;background:var(--bg)!important;border:0!important;padding:0!important}
+    .multi-table-host{display:block;padding:0}
+    .multi-table-host[hidden]{display:none!important}
+    .source-table-block{margin:0 0 22px 0;border-bottom:8px solid var(--bg)}
+    .source-table-block:last-child{margin-bottom:0;border-bottom:0}
+    .source-table-title{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:11px 16px;background:var(--brand-soft);color:var(--brand);font-size:12px;font-weight:800;border-top:1px solid rgba(184,58,11,.18);border-bottom:1px solid rgba(184,58,11,.18)}
+    .source-table-title small{font-size:10.5px;color:var(--text3);font-weight:700}
+    .source-table-block table{width:100%;border-collapse:separate;border-spacing:0;min-width:880px}
+    .source-table-break{height:22px;background:var(--bg);border-top:1px dashed var(--line2);border-bottom:1px dashed var(--line2)}
     .nav-row{display:flex;gap:5px;flex-wrap:wrap}
     .nav-row .tbtn{width:32px;height:32px}
     .nav-row .tbtn i{font-size:15px}
@@ -230,6 +255,106 @@
     }
     details.col-drop summary::-webkit-details-marker{display:none}
     details.col-drop summary i{font-size:14px}
+
+
+    /* ─ COLLAPSIBLE FILTER TOOL SECTIONS ─ */
+    .drop-menu .dsec.tool-collapsible{
+      margin-bottom:9px;
+      border:1px solid var(--line);
+      border-radius:var(--rl);
+      background:var(--surface);
+      overflow:hidden;
+    }
+    .drop-menu .dsec.tool-collapsible:last-child{margin-bottom:0}
+    .drop-menu .dsec.tool-collapsible>.dlabel{
+      margin:0;
+      padding:9px 11px;
+      border-bottom:0;
+      cursor:pointer;
+      user-select:none;
+      justify-content:space-between;
+      background:linear-gradient(180deg,var(--surface2),var(--surface));
+      transition:background .15s,color .15s;
+    }
+    .drop-menu .dsec.tool-collapsible>.dlabel:hover{
+      color:var(--brand);
+      background:var(--brand-soft);
+    }
+    .drop-menu .dsec.tool-collapsible>.dlabel:focus-visible{
+      outline:2px solid rgba(184,58,11,.35);
+      outline-offset:-2px;
+    }
+    .dlabel-main{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      min-width:0;
+    }
+    .dsec-caret{
+      margin-left:auto;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      width:22px;
+      height:22px;
+      border-radius:999px;
+      color:var(--text3);
+      transition:transform .18s,color .15s,background .15s;
+      flex-shrink:0;
+    }
+    .drop-menu .dsec.tool-collapsible>.dlabel:hover .dsec-caret{
+      color:var(--brand);
+      background:rgba(184,58,11,.08);
+    }
+    .drop-menu .dsec.tool-collapsible.is-open>.dlabel{
+      border-bottom:1px solid var(--line);
+    }
+    .drop-menu .dsec.tool-collapsible.is-open .dsec-caret{
+      transform:rotate(180deg);
+      color:var(--brand);
+    }
+    .dsec-body{
+      padding:11px;
+      animation:toolSectionOpen .16s ease-out;
+    }
+    .dsec-body[hidden]{display:none!important}
+    @keyframes toolSectionOpen{
+      from{opacity:.35;transform:translateY(-3px)}
+      to{opacity:1;transform:translateY(0)}
+    }
+    details.col-drop{
+      border:1px solid var(--line);
+      border-radius:var(--rl);
+      background:var(--surface);
+      padding:0;
+      overflow:hidden;
+    }
+    details.col-drop summary{
+      margin:0;
+      border:0;
+      width:100%;
+      justify-content:space-between;
+      border-radius:0;
+      padding:9px 11px;
+      background:linear-gradient(180deg,var(--surface2),var(--surface));
+    }
+    details.col-drop summary::after{
+      content:'⌄';
+      margin-left:auto;
+      color:var(--text3);
+      font-size:15px;
+      transition:transform .18s,color .15s;
+    }
+    details.col-drop[open] summary{
+      border-bottom:1px solid var(--line);
+    }
+    details.col-drop[open] summary::after{
+      transform:rotate(180deg);
+      color:var(--brand);
+    }
+    details.col-drop .col-grid{
+      padding:11px;
+    }
 
     /* ─ TABLE ─ */
     .table-wrap{
@@ -411,7 +536,7 @@
       .table-wrap{box-shadow:none;border:none}thead th{position:static}
     }
   </style>
-<!-- floating-header-clone-version: 2026-06-04; export-fix-final: 2026-06-04 -->
+<!-- floating-header-clone-version: 2026-06-04; export-fix-final: 2026-06-04; vertical-data-tables-fix: 2026-06-05 -->
 </head>
 <body>
 <div class="wrap" id="top">
@@ -499,6 +624,18 @@
               <div class="field"><label>Go to page</label><input id="goPageInput" type="number" min="1" placeholder="Page #"></div>
               <button id="goPageBtn" class="tbtn primary" data-tip="Go"><i class="ph ph-arrow-right"></i></button>
             </div>
+          </div>
+
+
+          <div class="dsec">
+            <div class="dlabel"><i class="ph ph-database"></i> Data Files</div>
+            <div class="data-file-panel" id="dataFileList">
+              <label class="data-file-item"><span class="data-file-name"><input type="checkbox" id="dataFileAll" checked> ALL</span><span class="data-file-count" id="dataFileTotal">0</span></label>
+            </div>
+            <div class="chk-wrap" style="margin-top:8px">
+              <label class="chk-item" data-tip="Same header भएका checked data files लाई एउटै table जस्तो join गर्छ"><input id="joinSameHeaderToggle" type="checkbox"> Join table with same header</label>
+            </div>
+            <div class="freeze-note">Unchecked files table view/filter/export बाट हट्छन्। Join unchecked हुँदा checked files अलग-अलग table block को रूपमा एउटाको तल अर्को देखिन्छन्।</div>
           </div>
 
           <div class="dsec">
@@ -698,6 +835,7 @@
       <tr><td colspan="8"><div class="empty-state">Data loading from *data.js / *dataN.js…</div></td></tr>
     </tbody>
   </table>
+  <div id="multiTables" class="multi-table-host" hidden></div>
   <div id="empty" class="empty-state" hidden>
     कुनै अभिलेख भेटिएन।<br>
     <small style="color:var(--text3);font-size:12.5px">Search / filter परिवर्तन गरी हेर्नुहोस्।</small>
@@ -744,6 +882,8 @@ let RAW_DATA=[];
 let DATA=[];
 let HEADERS=[['__sn','S.N.']];
 let DATA_KEYS=[];
+let DATA_SOURCES=[];
+let selectedDataFiles=new Set();
 
 const DATA_FILE_RE=/[^\/]*data\d*\.js$/i;
 const DEFAULT_DATA_CANDIDATES=['cbdata.js','cbdata1.js','cbdata2.js','cbdata3.js','advocatedata.js','advocatedata1.js','advocatedata2.js','advocatedata3.js'];
@@ -784,14 +924,14 @@ function prepareRows(rows){
   const objRows=rows.filter(r=>r&&typeof r==='object'&&!Array.isArray(r));
   const keyOrder=[];
   for(const r of objRows){
-    for(const k of Object.keys(r)) if(!keyOrder.includes(k)) keyOrder.push(k);
+    for(const k of Object.keys(r)) if(k!=='__dataSource'&&!keyOrder.includes(k)) keyOrder.push(k);
   }
   const validKeys=keyOrder.filter(k=>!isProbablyEmptyColumn(k,objRows));
   DATA_KEYS=validKeys;
   HEADERS=[['__sn','S.N.'],...DATA_KEYS.map(k=>[k,k])];
   state.visibleCols=new Set(HEADERS.map(([k])=>k));
   return objRows.map((r,idx)=>{
-    const out={__rowIndex:idx};
+    const out={__rowIndex:idx,__dataSource:cleanText(r.__dataSource||'')};
     for(const k of DATA_KEYS){
       const val=(k==='क्र.सं.'||/serial|s\.?n\.?|क्र/i.test(k))?normalizeSerial(r[k]):cleanText(r[k]);
       out[k]=val;
@@ -860,6 +1000,30 @@ function collectGlobalData(){
   return [];
 }
 function uniqueList(arr){return [...new Set((arr||[]).map(x=>String(x||'').trim()).filter(Boolean))];}
+function rowKeysForSource(rows){
+  const keys=[];
+  for(const r of (rows||[])){
+    if(!r||typeof r!=='object'||Array.isArray(r))continue;
+    for(const k of Object.keys(r)) if(!keys.includes(k)) keys.push(k);
+  }
+  return keys;
+}
+function sourceHeaderSignature(rows){return rowKeysForSource(rows).filter(k=>!isProbablyEmptyColumn(k,rows||[])).join('¦');}
+function selectedSourceNames(){
+  if(!selectedDataFiles.size) return DATA_SOURCES.map(s=>s.file);
+  return DATA_SOURCES.map(s=>s.file).filter(f=>selectedDataFiles.has(f));
+}
+function isSelectedSource(file){return selectedSourceNames().includes(file);}
+function selectedSources(){return DATA_SOURCES.filter(s=>isSelectedSource(s.file));}
+function selectedSourcesHaveSameHeader(){
+  const sigs=[...new Set(selectedSources().map(s=>s.headerSig||''))].filter(Boolean);
+  return sigs.length<=1;
+}
+function passesSelectedDataFiles(row){
+  if(!DATA_SOURCES.length) return true;
+  if(!selectedDataFiles.size) return true;
+  return selectedDataFiles.has(row.__dataSource);
+}
 function isAcceptedDataFile(name){
   const clean=String(name||'').split(/[?#]/)[0].split('/').pop();
   return DATA_FILE_RE.test(clean);
@@ -920,22 +1084,35 @@ async function loadDataFiles(){
   const candidates=await discoverDataFiles();
   const allRows=[];
   const loaded=[];
+  const sources=[];
   for(const file of candidates){
     try{
       const txt=await fetchTextFile(file);
       const rows=extractJsonArrays(txt);
-      if(rows.length){allRows.push(...rows);loaded.push(file);}
+      if(rows.length){
+        const sourceRows=rows.map(r=>r&&typeof r==='object'&&!Array.isArray(r)?{...r,__dataSource:file}:r);
+        allRows.push(...sourceRows);
+        loaded.push(file);
+        sources.push({file,rows:sourceRows,count:sourceRows.length,headerSig:sourceHeaderSignature(sourceRows)});
+      }
     }catch(e){/* try next */}
   }
-  if(allRows.length){loadedDataSources=loaded;return {rows:allRows,source:loaded.join(', '),mode:'fetch-json'};}
+  if(allRows.length){DATA_SOURCES=sources;loadedDataSources=loaded;return {rows:allRows,source:loaded.join(', '),mode:'fetch-json',sources};}
 
   registeredDataChunks=[];
   for(const file of candidates){
     try{await loadScript(file,{optional:true});}catch(e){/* try next */}
   }
   const rows=collectGlobalData();
-  if(rows.length){loadedDataSources=candidates;return {rows,source:candidates.join(', '),mode:'script'};}
-  return {rows:[],source:candidates.join(', ')||'*data.js',mode:'none'};
+  if(rows.length){
+    const file=candidates.filter(Boolean).join(', ')||'registered data';
+    const sourceRows=rows.map(r=>r&&typeof r==='object'&&!Array.isArray(r)?{...r,__dataSource:file}:r);
+    DATA_SOURCES=[{file,rows:sourceRows,count:sourceRows.length,headerSig:sourceHeaderSignature(sourceRows)}];
+    loadedDataSources=candidates;
+    return {rows:sourceRows,source:file,mode:'script',sources:DATA_SOURCES};
+  }
+  DATA_SOURCES=[];
+  return {rows:[],source:candidates.join(', ')||'*data.js',mode:'none',sources:[]};
 }
 
 /* ── NORMALIZATION / SEARCH ── */
@@ -1067,6 +1244,7 @@ function syncFloatingHeaderGeometry(){
 function showFloatingHeaderIfNeeded(){
   const wrap=document.querySelector('.table-wrap'),fh=$('floatingTableHeader'),thead=$('theadRow');
   const enabled=$('freezeHeaderToggle')?.checked!==false;
+  if($('dataTable')&&$('dataTable').style.display==='none'){hideFloatingHeader();return;}
   if(!wrap||!fh||!thead||!enabled){hideFloatingHeader();return;}
   const rect=wrap.getBoundingClientRect();
   const topLimit=getRibbonBottom();
@@ -1200,7 +1378,7 @@ function applySort(rows){
 }
 function applySearch(resetPage=true){
   state.query=$('q').value.trim();
-  const base=DATA.filter(passesFilters);
+  const base=DATA.filter(row=>passesSelectedDataFiles(row)&&passesFilters(row));
   const matched=$('filterRows').checked?base.filter(matchesQuery):base;
   state.filtered=applySort(matched);
   if(resetPage)state.page=1;
@@ -1286,15 +1464,62 @@ function rowCell(k,r,i,start){
     : `<span class="${contentClass}">${cellHtml(val)}<\/span>`;
   return`<td data-col-key="${escHtml(k)}" data-col-idx="${colIdx}" class="${cls}"><div class="cell-flex">${inner}<button class="cell-copy-btn" data-copy="${escHtml(val)}" title="copy cell">${COPY_ICON}<\/button><\/div><\/td>`;
 }
+
+function shouldRenderSeparateDataTables(){
+  const join=$('joinSameHeaderToggle')?.checked;
+  const selected=selectedSources();
+  return selected.length>1 && (!join || !selectedSourcesHaveSameHeader());
+}
+function groupedTableRows(rows,headers,start){
+  return rows.map((r,i)=>`<tr>${headers.map(([k])=>rowCell(k,r,i,start)).join('')}</tr>`).join('');
+}
+function tableHeaderHtml(headers){
+  return headers.map(([k,label],idx)=>`<th data-col-key="${escHtml(k)}" data-col-idx="${idx}" class="${k==='__sn'?'col-sn':''}${columnClass(k)}"><div class="th-flex">${headerLabelHtml(k,label)}<button class="head-copy-btn" data-col-key="${escHtml(k)}" title="copy whole column">${COPY_ICON}<\/button><\/div><\/th>`).join('');
+}
+function renderSeparateDataTables(rows,headers,start){
+  const host=$('multiTables');
+  if(!host)return;
+  if(!rows.length){host.innerHTML='';return;}
+  const order=selectedSourceNames();
+  const groups=[];
+  for(const source of order){
+    const items=[];
+    rows.forEach((r,i)=>{if((r.__dataSource||'')===source)items.push({row:r,pagePos:i});});
+    if(items.length)groups.push({source,items});
+  }
+  rows.forEach((r,i)=>{
+    const source=r.__dataSource||'Unknown data file';
+    if(!groups.some(g=>g.source===source))groups.push({source,items:[{row:r,pagePos:i}]});
+  });
+  host.innerHTML=groups.map((g,gi)=>{
+    const totalCount=state.filtered.filter(x=>(x.__dataSource||'')===g.source).length;
+    const body=g.items.map(({row,pagePos})=>`<tr>${headers.map(([k])=>rowCell(k,row,pagePos,start)).join('')}</tr>`).join('');
+    const breakHtml=gi<groups.length-1?'<div class="source-table-break" aria-hidden="true"><\/div>':'';
+    return `<section class="source-table-block" data-source-table="${escHtml(g.source)}">
+      <div class="source-table-title"><span><i class="ph ph-file-js"><\/i> ${escHtml(g.source)}<\/span><small>${g.items.length.toLocaleString()} shown / ${totalCount.toLocaleString()} records<\/small><\/div>
+      <table class="source-subtable"><thead><tr>${tableHeaderHtml(headers)}<\/tr><\/thead><tbody>${body}<\/tbody><\/table>
+      ${breakHtml}
+    <\/section>`;
+  }).join('');
+}
 function render(){
   if($('transposeToggle')?.checked){
+    if($('multiTables')){$('multiTables').hidden=true;$('multiTables').innerHTML='';}
+    if($('dataTable'))$('dataTable').style.display='';
     renderTransposed();
     return;
   }
   renderHeader();
   const{rows,pages,start}=visibleSlice();
   const headers=getOrderedHeaders();
-  $('tbody').innerHTML=rows.length?rows.map((r,i)=>`<tr>${headers.map(([k])=>rowCell(k,r,i,start)).join('')}<\/tr>`).join(''):'';
+  const separate=shouldRenderSeparateDataTables();
+  if($('dataTable'))$('dataTable').style.display=separate?'none':'';
+  if($('multiTables')){
+    $('multiTables').hidden=!separate;
+    if(separate)renderSeparateDataTables(rows,headers,start);
+    else $('multiTables').innerHTML='';
+  }
+  $('tbody').innerHTML=(!separate&&rows.length)?groupedTableRows(rows,headers,start):'';
   $('empty').hidden=rows.length!==0;
   const shown=state.filtered.length.toLocaleString(),total=DATA.length.toLocaleString();
   $('shownCount').textContent=shown;$('totalCount').textContent=total;
@@ -1362,6 +1587,42 @@ function pickKey(candidates){
   return '';
 }
 function setFieldLabel(id,text){const field=$(id)?.closest('.field');const label=field?.querySelector('label');if(label)label.textContent=text;}
+function renderDataFileControls(){
+  const list=$('dataFileList');
+  if(!list) return;
+  const total=DATA_SOURCES.reduce((a,s)=>a+(s.count||0),0);
+  const allChecked=DATA_SOURCES.length>0 && selectedDataFiles.size===DATA_SOURCES.length;
+  list.innerHTML=`<label class="data-file-item"><span class="data-file-name"><input type="checkbox" id="dataFileAll" ${allChecked?'checked':''}> ALL</span><span class="data-file-count" id="dataFileTotal">${total.toLocaleString()}</span></label>`+
+    DATA_SOURCES.map(s=>`<label class="data-file-item" title="${escHtml(s.file)}"><span class="data-file-name"><input type="checkbox" data-data-file="${escHtml(s.file)}" ${selectedDataFiles.has(s.file)?'checked':''}> <i class="ph ph-file-js"></i> ${escHtml(s.file)}</span><span class="data-file-count">${Number(s.count||0).toLocaleString()}</span></label>`).join('');
+}
+function bindDataFileControls(){
+  const list=$('dataFileList');
+  if(!list || list.dataset.bound==='1') return;
+  list.dataset.bound='1';
+  list.addEventListener('change',e=>{
+    const t=e.target;
+    if(t.id==='dataFileAll'){
+      selectedDataFiles=new Set(t.checked?DATA_SOURCES.map(s=>s.file):[]);
+      if(!selectedDataFiles.size && DATA_SOURCES.length) selectedDataFiles=new Set(DATA_SOURCES.map(s=>s.file));
+      renderDataFileControls();applySearch();return;
+    }
+    if(t.matches('input[data-data-file]')){
+      const file=t.dataset.dataFile;
+      if(t.checked)selectedDataFiles.add(file);else selectedDataFiles.delete(file);
+      if(!selectedDataFiles.size){selectedDataFiles.add(file);t.checked=true;showToast('कम्तीमा एउटा data file checked हुनुपर्छ');}
+      renderDataFileControls();applySearch();
+    }
+  });
+  $('joinSameHeaderToggle')?.addEventListener('change',()=>{
+    if($('joinSameHeaderToggle').checked && !selectedSourcesHaveSameHeader()) showToast('Header फरक भएकाले files अलग-अलग group मा देखाइन्छ');
+    applySearch();
+  });
+}
+function initDataFileControls(){
+  if(DATA_SOURCES.length && !selectedDataFiles.size) selectedDataFiles=new Set(DATA_SOURCES.map(s=>s.file));
+  bindDataFileControls();
+  renderDataFileControls();
+}
 function initDynamicControls(){
   const colOptions='<option value="all">All columns<\/option>'+DATA_KEYS.map(k=>`<option value="${escHtml(k)}">${escHtml(plainHeaderLabel(k,k))}<\/option>`).join('');
   $('column').innerHTML=colOptions;
@@ -1396,7 +1657,7 @@ function initColumns(){
 function clearAll(){
   $('q').value='';$('column').value='all';$('mode').value='contains';
   $('sexFilter').value='';$('typeFilter').value='';$('licFrom').value='';$('licTo').value='';
-  $('filterRows').checked=true;$('nepaliNorm').checked=true;if($('copyFormat'))$('copyFormat').value='tsv';if($('downloadFormat'))$('downloadFormat').value='xls';if($('copyCustomSeparator'))$('copyCustomSeparator').value='|';updateCopySeparatorState();$('customTextToggle').checked=false;$('customTextValue').value='';$('customTextPosition').value='prefix';$('customTextColumns').value='';$('freezeHeaderToggle').checked=true;$('freezeToggle').checked=false;$('freezeCols').value='0';$('columnSequence').value='';$('wrapTextToggle').checked=true;if($('transposeToggle'))$('transposeToggle').checked=false;if($('autoFitToggle'))$('autoFitToggle').checked=false;refreshColumnOrder();applyHeaderFreezeSetting();applyWrapTextSetting();applyAutoFitSetting();applyTransposeSetting();
+  $('filterRows').checked=true;$('nepaliNorm').checked=true;if($('copyFormat'))$('copyFormat').value='tsv';if($('downloadFormat'))$('downloadFormat').value='xls';if($('copyCustomSeparator'))$('copyCustomSeparator').value='|';updateCopySeparatorState();$('customTextToggle').checked=false;$('customTextValue').value='';$('customTextPosition').value='prefix';$('customTextColumns').value='';$('freezeHeaderToggle').checked=true;$('freezeToggle').checked=false;$('freezeCols').value='0';$('columnSequence').value='';$('wrapTextToggle').checked=true;if($('transposeToggle'))$('transposeToggle').checked=false;if($('autoFitToggle'))$('autoFitToggle').checked=false;if($('joinSameHeaderToggle'))$('joinSameHeaderToggle').checked=false;selectedDataFiles=new Set(DATA_SOURCES.map(s=>s.file));renderDataFileControls();refreshColumnOrder();applyHeaderFreezeSetting();applyWrapTextSetting();applyAutoFitSetting();applyTransposeSetting();
   $('sortColumn').value='';$('sortOrder').value='az';state.sortCol='';state.sortOrder='az';
   state.page=1;applySearch();
 }
@@ -1627,7 +1888,7 @@ function freezeNumber(id,max){
   return Math.min(n,max);
 }
 function clearFreezeStyles(){
-  document.querySelectorAll('#dataTable th,#dataTable td').forEach(el=>{
+  document.querySelectorAll('#dataTable th,#dataTable td,#multiTables th,#multiTables td').forEach(el=>{
     el.classList.remove('freeze-sticky');
     ['left','top','zIndex'].forEach(p=>el.style[p]='');
   });
@@ -1636,7 +1897,7 @@ function applyFreeze(){
   clearFreezeStyles();
   const toggle=$('freezeToggle');
   if(!toggle||!toggle.checked)return;
-  const table=$('dataTable'); if(!table)return;
+  const table=(!$('dataTable')||$('dataTable').style.display==='none')?document.querySelector('#multiTables table'):$('dataTable'); if(!table)return;
   const visibleHeaders=Array.from(table.querySelectorAll('thead th:not(.hidden-col)'));
   const colCount=freezeNumber('freezeCols',visibleHeaders.length);
   let left=0;
@@ -1644,7 +1905,7 @@ function applyFreeze(){
     const th=visibleHeaders[i]; if(!th)continue;
     const idx=th.dataset.colIdx;
     const width=th.offsetWidth;
-    document.querySelectorAll(`#dataTable [data-col-idx="${idx}"]`).forEach(cell=>{
+    document.querySelectorAll(`#dataTable [data-col-idx="${idx}"],#multiTables [data-col-idx="${idx}"]`).forEach(cell=>{
       cell.classList.add('freeze-sticky');
       cell.style.left=`${left}px`;
       cell.style.zIndex=cell.tagName==='TH'?'35':'22';
@@ -1714,7 +1975,59 @@ function updateFloatingButtons(){
 }
 
 /* ── EVENTS ── */
+
+function initCollapsibleToolSections(){
+  const sections=[
+    ...document.querySelectorAll('#settingsDrop .drop-menu.wide-menu > .dsec'),
+    ...document.querySelectorAll('#navDropMenu > .dsec')
+  ];
+  sections.forEach((sec,idx)=>{
+    if(sec.classList.contains('tool-collapsible')) return;
+    const label=sec.querySelector(':scope > .dlabel');
+    if(!label) return;
+    const body=document.createElement('div');
+    body.className='dsec-body';
+
+    const bodyNodes=Array.from(sec.childNodes).filter(node=>node!==label);
+    bodyNodes.forEach(node=>body.appendChild(node));
+
+    const labelInner=document.createElement('span');
+    labelInner.className='dlabel-main';
+    while(label.firstChild) labelInner.appendChild(label.firstChild);
+    label.appendChild(labelInner);
+
+    const caret=document.createElement('span');
+    caret.className='dsec-caret';
+    caret.setAttribute('aria-hidden','true');
+    caret.innerHTML='<i class="ph ph-caret-down"></i>';
+    label.appendChild(caret);
+
+    sec.classList.add('tool-collapsible');
+    label.setAttribute('role','button');
+    label.setAttribute('tabindex','0');
+
+    const isSettingsSection=!!sec.closest('#settingsDrop');
+    const defaultOpen=isSettingsSection ? idx===0 : idx===sections.findIndex(s=>s.closest('#navDropMenu'));
+    function setOpen(open){
+      sec.classList.toggle('is-open',open);
+      body.hidden=!open;
+      label.setAttribute('aria-expanded',open?'true':'false');
+    }
+    label.addEventListener('click',()=>setOpen(body.hidden));
+    label.addEventListener('keydown',e=>{
+      if(e.key==='Enter'||e.key===' '){
+        e.preventDefault();
+        setOpen(body.hidden);
+      }
+    });
+
+    sec.appendChild(body);
+    setOpen(defaultOpen);
+  });
+}
+
 function bindEvents(){
+  initCollapsibleToolSections();
   $('navDropBtn').addEventListener('click',()=>{navDropOpen?navClose():navOpen();});
   $('navDrop').addEventListener('mouseenter',()=>{clearTimeout(navHideTimer);if(!navDropOpen)navOpen();});
   $('navDrop').addEventListener('mouseleave',()=>navScheduleClose());
@@ -1739,8 +2052,11 @@ function bindEvents(){
   ['licFrom','licTo'].forEach(id=>$(id).addEventListener('input',()=>{if($('realtime').checked)applySearch();}));
   $('nextHit').addEventListener('click',()=>nextHit(1));$('prevHit').addEventListener('click',()=>nextHit(-1));$('copyTable').addEventListener('click',copyTableToClipboard);$('copyFilteredData')?.addEventListener('click',()=>copyFilteredDataAs($('copyFormat')?.value||'tsv'));$('downloadFilteredData')?.addEventListener('click',()=>downloadFilteredDataAs($('downloadFormat')?.value||'xls'));$('copyFormat')?.addEventListener('change',updateCopySeparatorState);
   $('themeBtn').addEventListener('click',()=>setTheme(document.documentElement.dataset.theme==='dark'?'light':'dark'));
-  $('tbody').addEventListener('click',e=>{const btn=e.target.closest('.copy-btn,.cell-copy-btn,.row-copy-btn');if(!btn)return;if(btn.classList.contains('row-copy-btn')){if(btn.dataset.transRowKey)copyTransposedRow(btn.dataset.transRowKey);else copyVisibleRowByPagePos(parseInt(btn.dataset.rowPos||'0',10));}else{copyText(btn.dataset.copy??btn.dataset.name??'','Cell copied');}btn.innerHTML=CHECK_ICON;btn.classList.add('copied');setTimeout(()=>{btn.innerHTML=COPY_ICON;btn.classList.remove('copied');},900);});
-  $('theadRow').addEventListener('click',e=>{const btn=e.target.closest('.head-copy-btn');if(!btn)return;e.stopPropagation();if(btn.dataset.transCol!==undefined)copyTransposedColumn(btn.dataset.transCol);else copyColumnByKey(btn.dataset.colKey);btn.innerHTML=CHECK_ICON;btn.classList.add('copied');setTimeout(()=>{btn.innerHTML=COPY_ICON;btn.classList.remove('copied');},900);});
+  function handleBodyCopyClick(e){const btn=e.target.closest('.copy-btn,.cell-copy-btn,.row-copy-btn');if(!btn)return;if(btn.classList.contains('row-copy-btn')){if(btn.dataset.transRowKey)copyTransposedRow(btn.dataset.transRowKey);else copyVisibleRowByPagePos(parseInt(btn.dataset.rowPos||'0',10));}else{copyText(btn.dataset.copy??btn.dataset.name??'','Cell copied');}btn.innerHTML=CHECK_ICON;btn.classList.add('copied');setTimeout(()=>{btn.innerHTML=COPY_ICON;btn.classList.remove('copied');},900);}
+  function handleHeadCopyClick(e){const btn=e.target.closest('.head-copy-btn');if(!btn)return;e.stopPropagation();if(btn.dataset.transCol!==undefined)copyTransposedColumn(btn.dataset.transCol);else copyColumnByKey(btn.dataset.colKey);btn.innerHTML=CHECK_ICON;btn.classList.add('copied');setTimeout(()=>{btn.innerHTML=COPY_ICON;btn.classList.remove('copied');},900);}
+  $('tbody').addEventListener('click',handleBodyCopyClick);
+  $('theadRow').addEventListener('click',handleHeadCopyClick);
+  $('multiTables')?.addEventListener('click',e=>{handleBodyCopyClick(e);handleHeadCopyClick(e);});
   $('floatingTableHeader')?.addEventListener('click',e=>{const btn=e.target.closest('.head-copy-btn');if(!btn)return;e.stopPropagation();if(btn.dataset.transCol!==undefined)copyTransposedColumn(btn.dataset.transCol);else copyColumnByKey(btn.dataset.colKey);btn.innerHTML=CHECK_ICON;btn.classList.add('copied');setTimeout(()=>{btn.innerHTML=COPY_ICON;btn.classList.remove('copied');},900);});
   $('firstPage').addEventListener('click',()=>{state.page=1;render();});$('prevPage').addEventListener('click',()=>{state.page--;render();});$('nextPage').addEventListener('click',()=>{state.page++;render();});$('lastPage').addEventListener('click',()=>{state.page=pageMeta().pages;render();});
   $('firstPageTop')?.addEventListener('click',()=>{state.page=1;render();window.scrollTo({top:0,behavior:'smooth'});});
@@ -1775,7 +2091,7 @@ async function bootTable(){
       if(empty){empty.hidden=false;empty.innerHTML='<div class="empty-state">Data file भेटिएन वा पढ्न सकिएन।<br><small style="color:var(--text3)">कृपया यही folder मा <b>*data.js<\/b> वा <b>*dataN.js<\/b> file राख्नुहोस्। उदाहरण: xyzdata.js, pqrdata2.js। Raw JSON array, <b>window.CB_DATA = [...]<\/b>, वा <b>registerData([...])<\/b> support हुन्छ।<\/small><\/div>';}
       return;
     }
-    initDynamicControls();initColumns();state.filtered=DATA.slice();applySearch();
+    initDataFileControls();initDynamicControls();initColumns();state.filtered=DATA.slice();applySearch();
     showToast(`${DATA.length.toLocaleString()} records loaded from ${result.source}`);
   }catch(err){
     clearInterval(timerId);console.error('Boot error:',err);
