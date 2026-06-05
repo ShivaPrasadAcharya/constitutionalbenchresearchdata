@@ -289,6 +289,8 @@
     .cell-copy-btn:hover{background:var(--brand-soft);color:var(--brand);border-color:rgba(184,58,11,.3)}
     .cell-copy-btn.copied{background:#d1fae5;color:var(--success);border-color:rgba(5,122,85,.3);opacity:1}
     .th-flex{display:flex;align-items:center;justify-content:space-between;gap:7px;min-width:80px}
+    .th-label{display:inline-flex;align-items:center;gap:6px;min-width:0}
+    .col-num{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:18px;padding:0 6px;border-radius:999px;background:var(--brand-soft);color:var(--brand);border:1px solid rgba(184,58,11,.16);font-size:10px;font-weight:800;letter-spacing:0}
     .head-copy-btn,.row-copy-btn{
       flex-shrink:0;width:21px;height:21px;background:var(--surface2);border:1px solid var(--line);
       border-radius:5px;cursor:pointer;color:var(--text3);display:inline-flex;align-items:center;
@@ -418,7 +420,7 @@
 <header class="hero">
   <div style="position:relative;z-index:1">
     <h1>संवैधानिक इजलास फैसला विवरण</h1>
-    <p class="hero-sub">source: cbdata.js &nbsp;·&nbsp; Smart Search &nbsp;·&nbsp; Developer: शिवप्रसाद आचार्य</p>
+    <p class="hero-sub">source: *data.js / *dataN.js &nbsp;·&nbsp; Smart Search &nbsp;·&nbsp; Developer: शिवप्रसाद आचार्य</p>
   </div>
   <div class="hero-actions">
     <!-- [FIX 3] README link -->
@@ -693,7 +695,7 @@
   <table id="dataTable">
     <thead><tr id="theadRow"></tr></thead>
     <tbody id="tbody">
-      <tr><td colspan="8"><div class="empty-state">Data loading from cbdata.js…</div></td></tr>
+      <tr><td colspan="8"><div class="empty-state">Data loading from *data.js / *dataN.js…</div></td></tr>
     </tbody>
   </table>
   <div id="empty" class="empty-state" hidden>
@@ -723,25 +725,37 @@
 
 <script>
 /* ── GENERIC CONSTITUTIONAL BENCH DATA LOADING ──
-   Expected primary file: cbdata.js in the same folder.
-   Supported formats:
+   Put one or more data files in the same folder.
+   Accepted file names: any name ending with data.js or dataN.js
+   Examples: cbdata.js, xyzdata.js, pqrdata2.js, senioradvocatedata12.js
+
+   Supported data formats inside each file:
    1) Raw JSON array: [ {...}, {...} ]
-   2) Multiple raw arrays pasted in one file: [ {...} ][ {...} ]
+   2) Multiple raw arrays in one file: [ {...} ][ {...} ]
    3) window.CB_DATA = [ ... ]; / const CB_DATA = [ ... ];
-   4) registerCBData([ ... ]);
+   4) registerData([ ... ]); / registerConstitutionalBenchData([ ... ]);
+
+   Note: Browsers cannot always list local folders opened with file://.
+   For fully automatic filename discovery, run the folder through a local/static server
+   that exposes directory listing, or provide data-files.json / datafiles.js, or use
+   ?data=xyzdata.js,pqrdata2.js in the address bar.
 */
 let RAW_DATA=[];
 let DATA=[];
 let HEADERS=[['__sn','S.N.']];
 let DATA_KEYS=[];
-const PRIMARY_DATA_FILE='cbdata.js';
-const DATA_FILE_CANDIDATES=['cbdata.js','CBData.js','cbData.js'];
-let registeredDataChunks=[];
 
-window.registerCBData=function(rows){
+const DATA_FILE_RE=/[^\/]*data\d*\.js$/i;
+const DEFAULT_DATA_CANDIDATES=['cbdata.js','cbdata1.js','cbdata2.js','cbdata3.js','advocatedata.js','advocatedata1.js','advocatedata2.js','advocatedata3.js'];
+let registeredDataChunks=[];
+let loadedDataSources=[];
+
+function registerData(rows){
   if(Array.isArray(rows)) registeredDataChunks.push(rows);
-};
-window.registerConstitutionalBenchData=window.registerCBData;
+}
+window.registerData=registerData;
+window.registerCBData=registerData;
+window.registerConstitutionalBenchData=registerData;
 
 const $=id=>document.getElementById(id);
 const state={query:'',page:1,filtered:[],hits:[],currentHitIndex:-1,visibleCols:new Set(['__sn']),sortCol:'',sortOrder:'az',filter1Key:'',filter2Key:'',rangeKey:'',columnOrder:[]};
@@ -840,29 +854,88 @@ function loadScript(src,{optional=false}={}){
   });
 }
 function collectGlobalData(){
-  const candidates=[window.CB_DATA,window.cbdata,window.cbData,window.CBDATA,window.CONSTITUTIONAL_BENCH_DATA,window.DATA,window.rows];
+  const candidates=[window.CB_DATA,window.cbdata,window.advocatedata,window.CONSTITUTIONAL_BENCH_DATA,window.DATA,window.rows];
   for(const c of candidates){if(Array.isArray(c)) return c;}
   if(registeredDataChunks.length) return registeredDataChunks.flat();
   return [];
 }
-async function loadCBData(){
-  // 1. Prefer fetch so a raw JSON array saved as cbdata.js works.
-  for(const file of DATA_FILE_CANDIDATES){
+function uniqueList(arr){return [...new Set((arr||[]).map(x=>String(x||'').trim()).filter(Boolean))];}
+function isAcceptedDataFile(name){
+  const clean=String(name||'').split(/[?#]/)[0].split('/').pop();
+  return DATA_FILE_RE.test(clean);
+}
+function parseQueryDataFiles(){
+  const params=new URLSearchParams(location.search);
+  const raw=params.get('data')||params.get('files')||'';
+  return raw.split(/[;,]+/).map(x=>x.trim()).filter(isAcceptedDataFile);
+}
+function parseScriptTagDataFiles(){
+  return Array.from(document.scripts||[])
+    .map(s=>s.getAttribute('src')||'')
+    .filter(isAcceptedDataFile)
+    .map(src=>src.split(/[?#]/)[0].split('/').pop());
+}
+async function getManifestFiles(){
+  const out=[];
+  try{
+    const txt=await fetchTextFile('data-files.json');
+    const json=JSON.parse(txt.replace(/^\uFEFF/,''));
+    const files=Array.isArray(json)?json:(Array.isArray(json.files)?json.files:[]);
+    out.push(...files.filter(isAcceptedDataFile));
+  }catch(e){/* optional */}
+
+  window.registerDataFiles=function(files){
+    if(Array.isArray(files)) window.DATA_FILES=(window.DATA_FILES||[]).concat(files);
+  };
+  try{await loadScript('datafiles.js',{optional:true});}catch(e){/* optional */}
+  try{await loadScript('data-files.js',{optional:true});}catch(e){/* optional */}
+  if(Array.isArray(window.DATA_FILES)) out.push(...window.DATA_FILES.filter(isAcceptedDataFile));
+  return out;
+}
+async function discoverDirectoryDataFiles(){
+  try{
+    const res=await fetch('./',{cache:'no-store'});
+    if(!res.ok) return [];
+    const html=await res.text();
+    const files=[];
+    const re=/href=["']([^"']+)["']/gi;
+    let m;
+    while((m=re.exec(html))){
+      const name=decodeURIComponent(m[1]).split(/[?#]/)[0].split('/').pop();
+      if(isAcceptedDataFile(name)) files.push(name);
+    }
+    return uniqueList(files);
+  }catch(e){return [];}
+}
+async function discoverDataFiles(){
+  const files=[];
+  files.push(...parseQueryDataFiles());
+  files.push(...parseScriptTagDataFiles());
+  files.push(...await getManifestFiles());
+  files.push(...await discoverDirectoryDataFiles());
+  files.push(...DEFAULT_DATA_CANDIDATES);
+  return uniqueList(files).filter(isAcceptedDataFile);
+}
+async function loadDataFiles(){
+  const candidates=await discoverDataFiles();
+  const allRows=[];
+  const loaded=[];
+  for(const file of candidates){
     try{
       const txt=await fetchTextFile(file);
       const rows=extractJsonArrays(txt);
-      if(rows.length) return {rows,source:file,mode:'fetch-json'};
+      if(rows.length){allRows.push(...rows);loaded.push(file);}
     }catch(e){/* try next */}
   }
-  // 2. Fallback: JS file that registers/assigns data.
-  for(const file of DATA_FILE_CANDIDATES){
-    try{
-      await loadScript(file,{optional:true});
-      const rows=collectGlobalData();
-      if(rows.length) return {rows,source:file,mode:'script'};
-    }catch(e){/* try next */}
+  if(allRows.length){loadedDataSources=loaded;return {rows:allRows,source:loaded.join(', '),mode:'fetch-json'};}
+
+  registeredDataChunks=[];
+  for(const file of candidates){
+    try{await loadScript(file,{optional:true});}catch(e){/* try next */}
   }
-  return {rows:[],source:PRIMARY_DATA_FILE,mode:'none'};
+  const rows=collectGlobalData();
+  if(rows.length){loadedDataSources=candidates;return {rows,source:candidates.join(', '),mode:'script'};}
+  return {rows:[],source:candidates.join(', ')||'*data.js',mode:'none'};
 }
 
 /* ── NORMALIZATION / SEARCH ── */
@@ -1184,9 +1257,19 @@ function cellHtml(text){
 
 /* ── RENDERING ── */
 function columnClass(k){return state.visibleCols.has(k)?'':' hidden-col';}
+function columnNumber(k){const idx=DATA_KEYS.indexOf(k);return idx>=0?idx+1:'';}
+function headerLabelHtml(k,label){
+  const n=columnNumber(k);
+  if(!n)return `<span>${escHtml(label)}<\/span>`;
+  return `<span class="th-label"><span class="col-num">${n}<\/span><span>${escHtml(label)}<\/span><\/span>`;
+}
+function plainHeaderLabel(k,label){
+  const n=columnNumber(k);
+  return n?`${n}. ${label}`:String(label);
+}
 function renderHeader(){
   const headers=getOrderedHeaders();
-  $('theadRow').innerHTML=headers.map(([k,label],idx)=>`<th data-col-key="${escHtml(k)}" data-col-idx="${idx}" class="${k==='__sn'?'col-sn':''}${columnClass(k)}"><div class="th-flex"><span>${escHtml(label)}<\/span><button class="head-copy-btn" data-col-key="${escHtml(k)}" title="copy whole column">${COPY_ICON}<\/button><\/div><\/th>`).join('');
+  $('theadRow').innerHTML=headers.map(([k,label],idx)=>`<th data-col-key="${escHtml(k)}" data-col-idx="${idx}" class="${k==='__sn'?'col-sn':''}${columnClass(k)}"><div class="th-flex">${headerLabelHtml(k,label)}<button class="head-copy-btn" data-col-key="${escHtml(k)}" title="copy whole column">${COPY_ICON}<\/button><\/div><\/th>`).join('');
 }
 const COPY_ICON=`<i class="ph ph-copy" style="font-size:11px"><\/i>`;
 const CHECK_ICON=`<i class="ph ph-check" style="font-size:11px"><\/i>`;
@@ -1240,7 +1323,7 @@ function renderTransposed(){
   });
   $('theadRow').innerHTML=headCells.join('');
   $('tbody').innerHTML=fields.length?fields.map(([k,label])=>{
-    const fieldCell=`<td class="trans-field-cell"><div class="sn-cell-flex"><span>${escHtml(label)}<\/span><button class="row-copy-btn" data-trans-row-key="${escHtml(k)}" title="copy field row">${COPY_ICON}<\/button><\/div><\/td>`;
+    const fieldCell=`<td class="trans-field-cell"><div class="sn-cell-flex">${headerLabelHtml(k,label)}<button class="row-copy-btn" data-trans-row-key="${escHtml(k)}" title="copy field row">${COPY_ICON}<\/button><\/div><\/td>`;
     const vals=rows.map((r,i)=>`<td data-trans-row-key="${escHtml(k)}" data-trans-col="${i}" class="${isLongTextKey(k)?' long-cell':''}">${transposedCellHtml(displayValue(r,k))}<\/td>`).join('');
     return `<tr>${fieldCell}${vals}<\/tr>`;
   }).join(''):'';
@@ -1280,9 +1363,9 @@ function pickKey(candidates){
 }
 function setFieldLabel(id,text){const field=$(id)?.closest('.field');const label=field?.querySelector('label');if(label)label.textContent=text;}
 function initDynamicControls(){
-  const colOptions='<option value="all">All columns<\/option>'+DATA_KEYS.map(k=>`<option value="${escHtml(k)}">${escHtml(k)}<\/option>`).join('');
+  const colOptions='<option value="all">All columns<\/option>'+DATA_KEYS.map(k=>`<option value="${escHtml(k)}">${escHtml(plainHeaderLabel(k,k))}<\/option>`).join('');
   $('column').innerHTML=colOptions;
-  $('sortColumn').innerHTML='<option value="">Default order<\/option>'+DATA_KEYS.map(k=>`<option value="${escHtml(k)}">${escHtml(k)}<\/option>`).join('');
+  $('sortColumn').innerHTML='<option value="">Default order<\/option>'+DATA_KEYS.map(k=>`<option value="${escHtml(k)}">${escHtml(plainHeaderLabel(k,k))}<\/option>`).join('');
 
   state.filter1Key=pickKey(['फैसला','decision','outcome','status','type']);
   state.filter2Key=pickKey(['मुद्दा','case','subject','विषय']);
@@ -1301,7 +1384,7 @@ function initDynamicControls(){
   refreshColumnOrder();
 }
 function initColumns(){
-  $('columnChecks').innerHTML=HEADERS.map(([k,label])=>`<label class="chk-item"><input type="checkbox" data-col="${escHtml(k)}" checked> ${escHtml(label)}<\/label>`).join('');
+  $('columnChecks').innerHTML=HEADERS.map(([k,label])=>`<label class="chk-item"><input type="checkbox" data-col="${escHtml(k)}" checked> ${escHtml(plainHeaderLabel(k,label))}<\/label>`).join('');
   $('columnChecks').addEventListener('change',e=>{
     if(!e.target.matches('input[data-col]'))return;
     const col=e.target.dataset.col;
@@ -1684,12 +1767,12 @@ async function bootTable(){
   try{setTheme(localStorage.getItem('cbTheme')||'light');}catch(e){setTheme('light');}
   const empty=$('empty');
   const startTime=performance.now();let timerId=null;
-  if(empty){empty.hidden=false;empty.innerHTML='<div class="empty-state">Loading cbdata.js… <span id="loadingTimer">0.0s<\/span><\/div>';timerId=setInterval(()=>{const timerEl=$('loadingTimer');if(timerEl)timerEl.textContent=`${((performance.now()-startTime)/1000).toFixed(1)}s`;},100);}
+  if(empty){empty.hidden=false;empty.innerHTML='<div class="empty-state">Loading *data.js / *dataN.js files… <span id="loadingTimer">0.0s<\/span><\/div>';timerId=setInterval(()=>{const timerEl=$('loadingTimer');if(timerEl)timerEl.textContent=`${((performance.now()-startTime)/1000).toFixed(1)}s`;},100);}
   try{
-    const result=await loadCBData();clearInterval(timerId);
+    const result=await loadDataFiles();clearInterval(timerId);
     RAW_DATA=result.rows;DATA=prepareRows(RAW_DATA);
     if(!DATA.length){
-      if(empty){empty.hidden=false;empty.innerHTML='<div class="empty-state">Data file भेटिएन वा पढ्न सकिएन।<br><small style="color:var(--text3)">कृपया <b>cbdata.js<\/b> यही folder मा राख्नुहोस्। Raw JSON array वा <b>window.CB_DATA = [...]<\/b> दुवै support हुन्छ।<\/small><\/div>';}
+      if(empty){empty.hidden=false;empty.innerHTML='<div class="empty-state">Data file भेटिएन वा पढ्न सकिएन।<br><small style="color:var(--text3)">कृपया यही folder मा <b>*data.js<\/b> वा <b>*dataN.js<\/b> file राख्नुहोस्। उदाहरण: xyzdata.js, pqrdata2.js। Raw JSON array, <b>window.CB_DATA = [...]<\/b>, वा <b>registerData([...])<\/b> support हुन्छ।<\/small><\/div>';}
       return;
     }
     initDynamicControls();initColumns();state.filtered=DATA.slice();applySearch();
